@@ -1,0 +1,58 @@
+# [client-side]
+
+# dependencies
+/r-chat-app/node_modules
+/r-chat-app/.pnp
+/r-chat-app/.pnp.js
+
+# testing
+/r-chat-app/coverage
+
+# production
+/r-chat-app/build
+
+# misc
+/r-chat-app/.DS_Store
+/r-chat-app/.env.local
+/r-chat-app/.env.development.local
+/r-chat-app/.env.test.local
+/r-chat-app/.env.production.local
+
+/r-chat-app/npm-debug.log*
+/r-chat-app/yarn-debug.log*
+/r-chat-app/yarn-error.log*
+
+# [server-side]
+/sb-chat-app/HELP.md
+/sb-chat-app/target/
+/sb-chat-app/!.mvn/wrapper/maven-wrapper.jar
+/sb-chat-app/!**/src/main/**/target/
+/sb-chat-app/!**/src/test/**/target/
+
+### STS ###
+/sb-chat-app/.apt_generated
+/sb-chat-app/.classpath
+/sb-chat-app/.factorypath
+/sb-chat-app/.project
+/sb-chat-app/.settings
+/sb-chat-app/.springBeans
+/sb-chat-app/.sts4-cache
+
+### IntelliJ IDEA ###
+/sb-chat-app/.idea
+/sb-chat-app/*.iws
+/sb-chat-app/*.iml
+/sb-chat-app/*.ipr
+
+### NetBeans ###
+/sb-chat-app/nbproject/private/
+/sb-chat-app/nbbuild/
+/sb-chat-app/dist/
+/sb-chat-app/nbdist/
+/sb-chat-app/.nb-gradle/
+/sb-chat-app/build/
+/sb-chat-app/!**/src/main/**/build/
+/sb-chat-app/!**/src/test/**/build/
+
+### VS Code ###
+/sb-chat-app/.vscode/
