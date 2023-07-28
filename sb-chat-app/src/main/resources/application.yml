@@ -1,0 +1,13 @@
+spring:
+  rabbitmq:
+    username: guest
+    password: guest
+    stomp:
+      port: 61613
+
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: ws-chat
+      auto-index-creation: true
