@@ -11,3 +11,9 @@ spring:
       port: 27017
       database: ws-chat
       auto-index-creation: true
+
+jwt:
+  issuer: 1ssuer
+  subject: s0bject
+  secret-key: x03x1eOWEfr3lx90AM
+  expire-minutes: 60
