@@ -13,8 +13,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+import static org.springframework.web.cors.CorsConfiguration.ALL;
 
 @Slf4j
 @Configuration
@@ -32,13 +37,27 @@ public class SecurityConfiguration {
 
         return security.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(configurer -> configurer.sessionCreationPolicy(STATELESS))
-                .cors(AbstractHttpConfigurer::disable)
+                .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfig()))
                 .userDetailsService(userDetailsService)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(matcherRegistry -> matcherRegistry
                         .requestMatchers("/user/**").hasRole("USER")
                         .anyRequest().permitAll())
                 .build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfig() {
+        var config = new CorsConfiguration();
+        config.addAllowedMethod(ALL);
+        config.addAllowedOrigin("http://localhost:3000");
+        config.addAllowedHeader(ALL);
+        config.setAllowCredentials(true);
+
+        var source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+
+        return source;
     }
 
     @Bean
