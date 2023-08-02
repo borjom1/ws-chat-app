@@ -1,11 +1,14 @@
 import ChatList from "../components/ChatList";
 import Chat from "../components/Chat";
-import { useEffect, useState } from "react";
-import { getStompClient } from "../ws/stompClient";
-import UsernameModal from "../components/UsernameModal";
-import { getTime } from "../utils/dateParser";
+import {useEffect, useState} from "react";
+import {getStompClient} from "../ws/stompClient";
+import {getTime} from "../utils/dateParser";
+import {getUser} from "../utils/localStorage";
+import {useNavigate} from "react-router-dom";
 
 const Index = () => {
+
+  const navigate = useNavigate();
 
   const [username, setUsername] = useState(null);
   const [stompClient, setStompClient] = useState(null);
@@ -21,21 +24,28 @@ const Index = () => {
   };
 
   useEffect(() => {
-    if (!username) {
+    const user = getUser();
+    if (!user) {
+      navigate('/sign_in');
       return;
     }
+
+    setUsername(user.login);
 
     // setup ws connection
     const stomp = getStompClient();
     setStompClient(stomp);
-    stomp.connect({username}, () => onConnected(stomp), e => console.log('error', e));
+    stomp.connect({username: user.login},
+      () => onConnected(stomp, user.login),
+      e => console.log('error', e)
+    );
 
-  }, [username]);
+  }, []);
 
-  const onConnected = stomp => {
+  const onConnected = (stomp, login) => {
     console.log(stomp);
     stomp.subscribe('/topic/connected', onPublicMessageReceived);
-    stomp.subscribe(`/queue/${username}`, onPrivateMessageReceived);
+    stomp.subscribe(`/queue/${login}`, onPrivateMessageReceived);
   };
 
   const onPublicMessageReceived = ({body}) => {
@@ -44,9 +54,9 @@ const Index = () => {
     const {username: login, timestamp} = JSON.parse(body);
 
     const connectMessage = {
-      id: timestamp, 
-      text: 'Just connected', 
-      time: getTime(new Date(timestamp)), 
+      id: timestamp,
+      text: 'Just connected',
+      time: getTime(new Date(timestamp)),
       isOwn: false
     };
 
@@ -58,9 +68,9 @@ const Index = () => {
     const {username: login, timestamp, text} = JSON.parse(body);
 
     const message = {
-      id: timestamp, 
-      text, 
-      time: getTime(new Date(timestamp)), 
+      id: timestamp,
+      text,
+      time: getTime(new Date(timestamp)),
       isOwn: false
     };
 
@@ -73,9 +83,9 @@ const Index = () => {
 
     // add my message
     updateChats(selectedChat, [{
-      id: Date.now(), 
-      text: msg, 
-      time: getTime(new Date()), 
+      id: Date.now(),
+      text: msg,
+      time: getTime(new Date()),
       isOwn: true
     }]);
 
@@ -92,25 +102,21 @@ const Index = () => {
   return (
     <div className="w-full h-[100vh] flex justify-center items-center">
       <div className="w-3/5 h-4/5 bg-eerie-black rounded-xl flex gap-3 py-3 px-3">
-        {!username ? <UsernameModal onClick={username => setUsername(username)} /> :
-          <>
-            <div className="w-[35%]">
-              <ChatList
-                // className={'hover:scale-[0.99] duration-200'}
-                chats={chats}
-                setSelectedChat={setSelectedChat}
-              />
-            </div>
-            <div className="w-[65%]">
-              <Chat
-                // className={'hover:scale-[0.99] duration-200'}
-                login={selectedChat}
-                messages={chats.get(selectedChat)}
-                onSendClick={handleSendClick}
-              />
-            </div>
-          </>
-        }
+        <div className="w-[35%]">
+          <ChatList
+            // className={'hover:scale-[0.99] duration-200'}
+            chats={chats}
+            setSelectedChat={setSelectedChat}
+          />
+        </div>
+        <div className="w-[65%]">
+          <Chat
+            // className={'hover:scale-[0.99] duration-200'}
+            login={selectedChat}
+            messages={chats.get(selectedChat)}
+            onSendClick={handleSendClick}
+          />
+        </div>
       </div>
     </div>
   );
