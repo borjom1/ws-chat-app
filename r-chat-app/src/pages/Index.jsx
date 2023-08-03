@@ -10,62 +10,79 @@ const Index = () => {
 
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState(null);
   const [stompClient, setStompClient] = useState(null);
   const [chats, setChats] = useState(new Map());
   const [selectedChat, setSelectedChat] = useState(null);
 
-  const updateChats = (login, messages) => {
+  const updateChats = (userId, data) => {
     setChats(prevChats => {
-      const oldMessages = prevChats.get(login);
-      const updMessages = oldMessages ? [...oldMessages, ...messages] : messages;
-      return new Map(prevChats.set(login, updMessages))
+      const {messages: newMessages, ...rest} = data;
+
+      const oldMessages = prevChats.get(userId)?.messages;
+      const updMessages = oldMessages ? [...oldMessages, ...newMessages] : newMessages;
+
+      return new Map(prevChats.set(userId, {
+        messages: updMessages,
+        ...rest
+      }))
+    });
+  };
+
+  const addMessage = (userId, message) => {
+    setChats(prevState => {
+      const chat = prevState.get(userId);
+      if (chat) {
+        const oldMessages = chat.messages;
+        chat.messages = oldMessages ? [...oldMessages, message] : [message];
+        return new Map(prevState);
+      }
     });
   };
 
   useEffect(() => {
-    const user = getUser();
-    if (!user) {
+    const storage = getUser();
+    if (!storage) {
       navigate('/sign_in');
       return;
     }
 
-    setUsername(user.login);
-
     // setup ws connection
     const stomp = getStompClient();
     setStompClient(stomp);
-    stomp.connect({username: user.login},
-      () => onConnected(stomp, user.login),
+    stomp.connect({id: storage.id},
+      () => onConnected(stomp, storage.id),
       e => console.log('error', e)
     );
 
   }, []);
 
-  const onConnected = (stomp, login) => {
+  const onConnected = (stomp, userId) => {
     console.log(stomp);
     stomp.subscribe('/topic/connected', onPublicMessageReceived);
-    stomp.subscribe(`/queue/${login}`, onPrivateMessageReceived);
+    stomp.subscribe(`/queue/${userId}`, onPrivateMessageReceived);
   };
 
   const onPublicMessageReceived = ({body}) => {
     console.log('public', body);
 
-    const {username: login, timestamp} = JSON.parse(body);
+    const {senderId, senderLogin, timestamp, text} = JSON.parse(body);
 
     const connectMessage = {
       id: timestamp,
-      text: 'Just connected',
+      text,
       time: getTime(new Date(timestamp)),
       isOwn: false
     };
 
-    updateChats(login, [connectMessage]);
+    updateChats(senderId, {
+      login: senderLogin,
+      messages: [connectMessage]
+    });
   };
 
   const onPrivateMessageReceived = ({body}) => {
     console.log('private', body);
-    const {username: login, timestamp, text} = JSON.parse(body);
+    const {senderId, senderLogin, timestamp, text} = JSON.parse(body);
 
     const message = {
       id: timestamp,
@@ -74,7 +91,10 @@ const Index = () => {
       isOwn: false
     };
 
-    updateChats(login, [message]);
+    updateChats(senderId, {
+      login: senderLogin,
+      messages: [message]
+    });
   };
 
   const handleSendClick = msg => {
@@ -82,16 +102,18 @@ const Index = () => {
     if (!selectedChat) return;
 
     // add my message
-    updateChats(selectedChat, [{
+    addMessage(selectedChat, {
       id: Date.now(),
       text: msg,
       time: getTime(new Date()),
       isOwn: true
-    }]);
+    });
+
+    const {id} = getUser();
 
     const message = {
-      sender: username,
-      receiver: selectedChat,
+      senderId: id,
+      receiverId: selectedChat,
       text: msg
     };
     console.log('message to send: ', message)
@@ -112,8 +134,7 @@ const Index = () => {
         <div className="w-[65%]">
           <Chat
             // className={'hover:scale-[0.99] duration-200'}
-            login={selectedChat}
-            messages={chats.get(selectedChat)}
+            meta={chats.get(selectedChat)}
             onSendClick={handleSendClick}
           />
         </div>
