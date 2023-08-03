@@ -9,6 +9,6 @@ import java.time.ZonedDateTime;
 @Getter
 public class BaseOutcomeMessage {
     private final MessageType type;
-    private final String username;
+    private final String senderId;
     private final ZonedDateTime timestamp;
 }

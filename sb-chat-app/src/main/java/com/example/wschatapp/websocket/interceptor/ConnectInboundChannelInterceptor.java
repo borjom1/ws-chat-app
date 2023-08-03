@@ -1,7 +1,9 @@
 package com.example.wschatapp.websocket.interceptor;
 
-import com.example.wschatapp.dto.BaseOutcomeMessage;
 import com.example.wschatapp.dto.MessageType;
+import com.example.wschatapp.dto.OutcomeTextMessage;
+import com.example.wschatapp.entity.UserEntity;
+import com.example.wschatapp.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -25,10 +27,12 @@ import static org.springframework.messaging.simp.stomp.StompCommand.CONNECT;
 public class ConnectInboundChannelInterceptor implements ChannelInterceptor {
 
     private final SimpMessagingTemplate messagingTemplate;
+    private final UserService userService;
 
     @Autowired
-    public ConnectInboundChannelInterceptor(@Lazy SimpMessagingTemplate messagingTemplate) {
+    public ConnectInboundChannelInterceptor(@Lazy SimpMessagingTemplate messagingTemplate, UserService userService) {
         this.messagingTemplate = messagingTemplate;
+        this.userService = userService;
     }
 
     @Override
@@ -42,10 +46,17 @@ public class ConnectInboundChannelInterceptor implements ChannelInterceptor {
         log.info("command: {} | destination: {}", accessor.getCommand(), accessor.getDestination());
 
         if (Objects.equals(accessor.getCommand(), CONNECT)) {
-            ofNullable(accessor.getNativeHeader("username"))
+            ofNullable(accessor.getNativeHeader("id"))
                     .map(list -> list.get(0))
-                    .ifPresent(usernameHeader -> {
-                        var payload = new BaseOutcomeMessage(MessageType.CONNECT, usernameHeader, now());
+                    .ifPresent(userIdHeader -> {
+                        UserEntity user = userService.find(userIdHeader);
+                        var payload = new OutcomeTextMessage(
+                                MessageType.CONNECT,
+                                user.getId(),
+                                user.getLogin(),
+                                now(),
+                                "Just connected"
+                        );
                         messagingTemplate.convertAndSend("/topic/connected", payload);
                     });
         }

@@ -1,4 +1,4 @@
 package com.example.wschatapp.dto;
 
-public record IncomeTextMessage(String sender, String receiver, String text) {
+public record IncomeTextMessage(String senderId, String receiverId, String text) {
 }
