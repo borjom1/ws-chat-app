@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
@@ -12,33 +11,42 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document(collection = "users")
+@Document(collection = "chats")
 @AllArgsConstructor
 @Data
 @Builder
-public class UserEntity {
+public class ChatEntity {
 
     @Id
     private String id;
 
     private String name;
+    private String avatar;
 
-    @Indexed(unique = true)
-    private String login;
-
-    private String password;
+    private boolean isPrivate;
 
     @Builder.Default
     private LocalDateTime created = LocalDateTime.now();
 
-    @Builder.Default
-    private LocalDateTime lastSeen = LocalDateTime.now();
-
-    @Builder.Default
-    private List<UserRoles> roles = new ArrayList<>();
+    private ChatType type;
+    private long membersLimit;
 
     @DocumentReference(lazy = true)
     @Builder.Default
-    private List<ChatEntity> chats = new ArrayList<>();
+    private List<UserEntity> members = new ArrayList<>();
+
+    @DocumentReference(lazy = true)
+    @Builder.Default
+    private List<MessageEntity> messages = new ArrayList<>();
+
+    public void addUser(UserEntity user) {
+        members.add(user);
+        user.getChats().add(this);
+    }
+
+    public void addMessage(MessageEntity message) {
+        messages.add(message);
+        message.setChat(this);
+    }
 
 }
