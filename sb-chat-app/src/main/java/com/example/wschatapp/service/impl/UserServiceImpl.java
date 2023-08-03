@@ -62,7 +62,8 @@ public class UserServiceImpl implements UserService {
         return buildUserDto(user);
     }
 
-    private UserEntity find(String id) {
+    @Override
+    public UserEntity find(String id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User[%s] not found".formatted(id)));
     }
