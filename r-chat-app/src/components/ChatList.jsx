@@ -4,13 +4,13 @@ import classNames from 'classnames';
 
 const ChatList = ({ className, chats, setSelectedChat }) => {
 
-  const mappedChats = Array.from(chats)?.map(([login, messages]) => {
-    const lastMsg = messages?.slice(-1)[0];
+  const mappedChats = Array.from(chats)?.map(([userId, data]) => {
+    const lastMsg = data.messages?.slice(-1)[0];
     return (
       <ChatItem
-        onClick={() => setSelectedChat(login)}
-        key={login}
-        name={login}
+        onClick={() => setSelectedChat(userId)}
+        key={userId}
+        name={data.login}
         time={lastMsg?.time}
         message={lastMsg?.text}
       />

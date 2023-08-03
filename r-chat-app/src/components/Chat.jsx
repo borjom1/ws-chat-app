@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { BsFillPersonFill } from 'react-icons/bs';
 import { AiOutlineSend } from 'react-icons/ai';
 import Message from './Message';
@@ -8,11 +8,11 @@ import '../styles/scrollbar.css';
 import classNames from 'classnames';
 import { SlLayers } from 'react-icons/sl';
 
-const Chat = ({ className, login, messages, onSendClick }) => {
+const Chat = ({ className, meta, onSendClick }) => {
 
   const [msgText, setMsgText] = useState('');
 
-  const mappedMessages = messages?.map(({ id, text, time, isOwn }) =>
+  const mappedMessages = meta?.messages?.map(({ id, text, time, isOwn }) =>
     <Message
       key={id}
       text={text}
@@ -28,7 +28,7 @@ const Chat = ({ className, login, messages, onSendClick }) => {
 
   return (
     <div className={root}>
-      {!login ?
+      {!meta ?
         <div className='h-full flex flex-col gap-1 justify-center items-center'>
             <SlLayers size={28} color={'#4E4E4E'}/>
             <p className='text-[#4E4E4E]'>Select any chat to start communication...</p>
@@ -38,7 +38,7 @@ const Chat = ({ className, login, messages, onSendClick }) => {
             <div className='bg-[#1e1e1e] rounded-full py-2 px-2'>
               <BsFillPersonFill size={30} color='#E8E8E8' />
             </div>
-            <h1 className="text-platinum-e8 text-2xl font-medium">{login}</h1>
+            <h1 className="text-platinum-e8 text-2xl font-medium">{meta.login}</h1>
           </div>
 
           <div className='h-[70%] border-2 border-[#282828] flex-col flex gap-4 mt-3 mx-2 rounded-md py-3 px-3 overflow-y-scroll'>
@@ -64,7 +64,6 @@ const Chat = ({ className, login, messages, onSendClick }) => {
           </div>
         </>
       }
-
     </div>
   );
 };
