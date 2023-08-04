@@ -45,16 +45,15 @@ const Chat = ({ className, meta, onSendClick }) => {
             {mappedMessages}
           </div>
 
-          <div className='h-[12%] mx-2 mt-3 flex gap-2 justify-between'>
+          <div className='h-[18%] mx-2 mt-3 flex gap-2 justify-between'>
             <MessageField
-              className='w-[90%] h-full'
+              className='w-[90%] h-[48%]'
               text={msgText}
               onChange={value => setMsgText(value)}
             />
             <Button
               onClick={() => {
                 setMsgText('');
-                console.log('clicked!');
                 onSendClick(msgText);
               }}
               bgClassName={'px-2 py-2 hover:bg-[#2B4071]'}
