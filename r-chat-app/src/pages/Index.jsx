@@ -9,7 +9,8 @@ import {useDispatch, useSelector} from "react-redux";
 import {
   updateChat,
   addMessage,
-  setStompClient
+  setStompClient,
+  getDuoChats
 } from "../store/slice/chatSlice";
 
 const Index = () => {
@@ -19,9 +20,14 @@ const Index = () => {
 
   const stompClient = useSelector(({chat}) => chat.stompClient);
   const chats = useSelector(({chat}) => chat.chats);
+  const isRequestRejected = useSelector(({chat}) => chat.isRequestRejected);
   const selectedChat = useSelector(({chat}) => chat.selectedChat);
 
+  console.count('render Index')
+
   useEffect(() => {
+    console.log('Index useEffect(): []')
+
     const storage = getUser();
     if (!storage) {
       navigate('/sign_in');
@@ -40,7 +46,17 @@ const Index = () => {
       );
     }
 
+    // pull chats
+    dispatch(getDuoChats());
+
   }, []);
+
+  useEffect(() => {
+    console.log(`Index useEffect(): [isRequestRejected=${isRequestRejected}]`)
+    if (isRequestRejected) {
+      navigate('/sign_in');
+    }
+  }, [isRequestRejected]);
 
   const onConnected = (stomp, userId) => {
     stomp.subscribe('/topic/connected', onPublicMessageReceived);
@@ -122,7 +138,7 @@ const Index = () => {
         <div className="w-[65%]">
           <Chat
             // className={'hover:scale-[0.99] duration-200'}
-            meta={chats.find(chat => chat.userId === selectedChat)}
+            meta={chats?.find(chat => chat.userId === selectedChat)}
             onSendClick={handleSendClick}
           />
         </div>
