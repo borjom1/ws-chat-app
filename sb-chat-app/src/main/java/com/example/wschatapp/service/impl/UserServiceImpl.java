@@ -15,6 +15,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Arrays;
 
 @Slf4j
 @Service
@@ -66,6 +69,12 @@ public class UserServiceImpl implements UserService {
     public UserEntity find(String id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User[%s] not found".formatted(id)));
+    }
+
+    @Override
+    @Transactional
+    public void save(UserEntity... users) {
+        userRepository.saveAll(Arrays.asList(users));
     }
 
     private UserDto buildUserDto(UserEntity user) {
