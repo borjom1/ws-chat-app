@@ -12,13 +12,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Optional;
+
+import static java.util.Comparator.comparing;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
-
     private final MessageRepository messageRepository;
 
     @Override
@@ -38,6 +41,12 @@ public class MessageServiceImpl implements MessageService {
                 newMessage.getCreated().atZone(ZoneId.systemDefault()),
                 newMessage.getText()
         );
+    }
+
+    @Override
+    public Optional<MessageEntity> getLastMessage(ChatEntity chat) {
+        return chat.getMessages().stream()
+                .max(comparing(MessageEntity::getCreated, LocalDateTime::compareTo));
     }
 
 }
