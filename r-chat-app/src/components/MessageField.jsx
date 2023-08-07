@@ -4,7 +4,7 @@ const MessageField = ({className, text, onChange}) => {
 
   const bgClasses = classNames(
     'resize-none outline-0',
-    'bg-[#282828] w-full py-3 px-4 overflow-hidden rounded-md',
+    'bg-[#282828] w-full h-3/5 py-3 px-4 overflow-hidden rounded-md',
     className
   );
 

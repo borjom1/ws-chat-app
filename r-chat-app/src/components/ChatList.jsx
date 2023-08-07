@@ -8,13 +8,13 @@ const ChatList = ({className, chats}) => {
 
   const dispatch = useDispatch();
 
-  const mappedChats = chats?.map(({userId, login, messages}) => {
-    const lastMsg = messages.slice(-1)[0];
+  const mappedChats = chats?.map(({userId, username, login, messages}) => {
+    const lastMsg = messages?.slice(-1)[0];
     return (
       <ChatItem
         onClick={() => dispatch(selectChat(userId))}
         key={userId}
-        name={login}
+        name={username ?? login}
         time={lastMsg?.time}
         message={lastMsg?.text}
       />
@@ -28,7 +28,7 @@ const ChatList = ({className, chats}) => {
 
   return (
     <div className={root}>
-      <div className="h-[10%] bg-blue-39 rounded-t-xl py-2.5 px-6 flex gap-3 items-center">
+      <div className="h-[12%] bg-blue-39 rounded-t-xl py-2.5 px-6 flex gap-3 items-center">
         <BiMessageSquareDetail size={30} color='#E8E8E8'/>
         <h1 className="text-platinum-e8 text-xl font-medium">All Chats</h1>
       </div>

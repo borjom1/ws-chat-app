@@ -26,10 +26,12 @@ const SignIn = () => {
   const [fieldErrors, setFieldErrors] = useState({});
 
   useEffect(() => {
+    console.log('SignIn useEffect(): []')
     dispatch(clearState());
   }, []);
 
   useEffect(() => {
+    console.log('SignIn useEffect(): [response]')
 
     if (getUser()) {
       navigate('/');

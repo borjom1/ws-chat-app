@@ -6,7 +6,7 @@ const Message = ({ text, time, isOwn }) => {
     isOwn ? 'bg-blue-39' : 'bg-gray',
     isOwn ? 'rounded-bl-[30px]' : 'rounded-br-[30px]',
     isOwn && 'self-end',
-    'w-max py-1 px-3 rounded-t-[30px] relative',
+    'w-max py-1 px-3 rounded-t-[30px] relative cursor-default',
   );
 
   const timeClasses = classNames(
